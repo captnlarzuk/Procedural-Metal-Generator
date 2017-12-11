@@ -1,6 +1,6 @@
 var CONFIG = {
   bpb: 4,
-  bpmSet: [80, 110, 120, 140 ]
+  bpmSet: [80, 110, 120, 140 ],
 }
 
 function draw_pattern( pattern, count, offset){
@@ -10,11 +10,11 @@ function draw_pattern( pattern, count, offset){
   for(var k = 0; k<= pattern.length; k ++)
   {
     if(!(k%4))
-      str += "<br />";
+    str += "<br />";
     if(typeof pattern[k] !== "undefined")
     for(var l = 0; l< pattern[k].length; l ++)
     {
-      cssclass = (count == k && offset == l)?playing:"";
+      cssclass = (count == k )?playing:"";
       if((pattern[k][l]==" "))
       str += "<span class='pattern_square pattern_square_empty"+cssclass+"'> </span>";
       else
@@ -24,12 +24,7 @@ function draw_pattern( pattern, count, offset){
   }
   str +=   "</div>";
   return str;
-}
-
-function createSeed(){
-  return md5(Math.random());
-}
-var PMG = new PROCEDURAL_METAL_GENERATOR_(document.getElementById('seedInput').value)  ;
+};
 function showInfo()
 {
   var str = "<div class='Info'>";
@@ -47,7 +42,8 @@ function showInfo()
   }
   str += "</div>";
   return str;
-}
+};
+
 function showTrackInfo(track){
   var str = "<div class='trackInfo'>";
   str += "<h2>"+track.name+"</h2>"
@@ -59,35 +55,29 @@ function showTrackInfo(track){
   +"</ul>";
   str += "</div>";
   return str;
-}
-function showPatternInfo()
-{
+};
 
-}
+function createSeed(){
+  return md5(Math.random());
+};
+
+var PMG = new PROCEDURAL_METAL_GENERATOR_(document.getElementById('seedInput').value)  ;
+
 
 function start(){
   setTimeout(start, PMG.timer);
   var info = PMG.getInfoDump();
-  document.getElementById('show').innerHTML = showInfo();
-
-/*  + "<pre>"+JSON.stringify(info.config, null, "\t")+"</pre>"
-  + "<pre>"+JSON.stringify(info.track[0].config, null, "\t")+"</pre>"
-  + "<pre>"+JSON.stringify(info.track[0].structureInfo.config, null, "\t")+"</pre>"
-  + "<pre>"+JSON.stringify(info.track[1].config, null, "\t")+"</pre>"
-  + "<pre>"+JSON.stringify(info.track[1].structureInfo.config, null, "\t")+"</pre>"
-  + "<pre>"+JSON.stringify(info.track[2].config, null, "\t")+"</pre>";
-  + "<pre>"+JSON.stringify(info.track[2].structureInfo.config, null, "\t")+"</pre>"*/
-   PMG.step();
+  if(PMG.getRedrawQuery() === true)
+  {
+    document.getElementById('show').innerHTML = showInfo();
+  }
+  PMG.step();
 }
-
-
 
 if('serviceWorker' in navigator) {
   navigator.serviceWorker
-           .register('./sw.js')
-           .then(function() { console.log("Service Worker Registered"); });
-
-
+  .register('./sw.js')
+  .then(function() { console.log("Service Worker Registered"); });
   var deferredPrompt;
 
   window.addEventListener('beforeinstallprompt', function(e) {
@@ -118,4 +108,3 @@ if('serviceWorker' in navigator) {
   });
 
 }
-

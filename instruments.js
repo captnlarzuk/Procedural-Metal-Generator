@@ -11,7 +11,7 @@ var PROCEDURAL_SEED_COMPUTER_ = function(seed){
     this.seed = seed;
     this.hash = md5(seed);
     this.offset = 0;
-  }
+  };
 
   this.getRecipeFrom = function(from)
   {
@@ -23,10 +23,12 @@ var PROCEDURAL_SEED_COMPUTER_ = function(seed){
     var keys = Object.keys(from);
     return from[keys[ index%keys.length]];
   };
+
   this.getRecipeIndex = function(){
     var hashByte = this.getHashByte();
     return parseInt(hashByte, 16);
   };
+
   this.getHashByte = function()
   {
     var hashByte = this.hash.slice(this.offset, this.offset+(this.hashByteLength));
@@ -141,6 +143,9 @@ var PMG_BASEPATTERNS = {
     [ " "," ", "bf", " "],
   ],
   symbals:[ ],
+  /*
+  Get four patterns to choose from.
+  */
   "getABCD": function(base_pattern){
     var pattern = [
       PSC.getRecipeFrom(base_pattern),
@@ -154,54 +159,51 @@ var PMG_BASEPATTERNS = {
   }
 }
 
-
-
+/*
+Structural presets for patterns.
+*/
 var PMG_STRUCTURES = {
   "ABBA":function(structures, offset){
     if(!structures || structures.length < 4)
     return null;
     return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+1)%3], structures[(offset+0)%3] ];
   },
+
   "ABBAABBA":function(structures, offset){
     if(!structures || structures.length < 4)
     return null;
     return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+1)%3], structures[(offset+0)%3],structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+1)%3], structures[(offset+0)%3] ];
   },
+
   "ABAB":function(structures, offset){
     if(!structures || structures.length < 4)
     return null;
     return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+0)%3], structures[(offset+1)%3] ];
   },
-  /*  "ABCD":function(structures){
-  if(!structures || structures.length < 4)
-  return null;
-  return [structures[0], structures[1], structures[2], structures[3] ];
-},
-"ABCA":function(structures){
-if(!structures || structures.length < 4)
-return null;
-return [structures[0], structures[1], structures[2], structures[0] ];
-},*/
-"ABCB":function(structures, offset){
-  if(!structures || structures.length < 4)
-  return null;
-  return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+2)%3], structures[(offset+1)%3] ];
-},
-"ABCC":function(structures, offset){
-  if(!structures || structures.length < 4)
-  return null;
-  return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+2)%3], structures[(offset+3)%3] ];
-},
-"ABCCCCBA":function(structures, offset){
-  if(!structures || structures.length < 4)
-  return null;
-  return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+2)%3], structures[(offset+3)%3],structures[(offset+3)%3], structures[(offset+3)%3], structures[(offset+2)%1], structures[(offset+0)%3] ];
-},
-"AABB":function(structures, offset){
-  if(!structures || structures.length < 4)
-  return null;
-  return [structures[(offset+0)%3], structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+1)%3] ];
-},
+
+  "ABCB":function(structures, offset){
+    if(!structures || structures.length < 4)
+    return null;
+    return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+2)%3], structures[(offset+1)%3] ];
+  },
+
+  "ABCC":function(structures, offset){
+    if(!structures || structures.length < 4)
+    return null;
+    return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+2)%3], structures[(offset+3)%3] ];
+  },
+
+  "ABCCCCBA":function(structures, offset){
+    if(!structures || structures.length < 4)
+    return null;
+    return [structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+2)%3], structures[(offset+3)%3],structures[(offset+3)%3], structures[(offset+3)%3], structures[(offset+2)%1], structures[(offset+0)%3] ];
+  },
+
+  "AABB":function(structures, offset){
+    if(!structures || structures.length < 4)
+    return null;
+    return [structures[(offset+0)%3], structures[(offset+0)%3], structures[(offset+1)%3], structures[(offset+1)%3] ];
+  },
 };
 
 var PMG_STRUCTURE_SET = function(base_patterns){
@@ -214,6 +216,9 @@ var PMG_STRUCTURE_SET = function(base_patterns){
   this.structureSet = [];
   this.offset = 0;
 
+  /*
+  Retrieve information from the structure object.
+  */
   this.getInfoDump = function(){
     return {
       "config":{
@@ -222,7 +227,8 @@ var PMG_STRUCTURE_SET = function(base_patterns){
         "offset": this.offset,
       },
     };
-  }
+  };
+
   /*
   Return a structure kit ( structure makerz callbacks )
   */
@@ -257,28 +263,37 @@ var PMG_STRUCTURE_SET = function(base_patterns){
     return this;
   }
 
+  /*
+  Retrieve the next pattern to be playend on this structure.
+  */
   this.getNextPattern = function()
   {
     return this.structureSet[this.offset++%this.structureSet.length]
   }
 
+  /*
+  Retrieve the current pattern.
+  */
   this.getPattern = function()
   {
     return this.structureSet[this.offset];
-  }
+  };
+
   this.reinit = function(){
     this.createStructureKit().createStructureSet(PMG_BASEPATTERNS.getABCD(this.base_patterns));
     this.offset = 0;
   }
 
+  /*
+  Initialise the structure with base patterns and create a procedural complete set.
+  */
   this.createStructureKit().createStructureSet(PMG_BASEPATTERNS.getABCD(this.base_patterns));
   return this
 };
-/*var PMG_PATTERN_ = function(){
-this.structure = new PMG_STRUCTURE_SET(this.patterns.drum);
-this.pattern = 0;
 
-}*/
+/*
+Track object: the procedural track to be played.
+*/
 var PMG_TRACK_ = function(name, vol,  instrument, structure){
   this.name = name;
   this.changed = 0;
@@ -300,10 +315,9 @@ var PMG_TRACK_ = function(name, vol,  instrument, structure){
 
     this.offset = this.currentTime%(CONFIG.bpb);
     if(!this.offset)
-      this.patternCount++;
+    this.patternCount++;
     if(this.patternCount > this.structure.repeat * 4)
     {
-      console.log("STEP " + this.name + this.changed  ) ;
       this.changed ++;
       this.pattern = this.structure.getNextPattern();
       this.currentTime = 0;
@@ -313,8 +327,6 @@ var PMG_TRACK_ = function(name, vol,  instrument, structure){
     var pat = this.pattern[this.patternCount%this.pattern.length];
     if(typeof pat == "undefined")
     {
-      console.log(this.name + "shit" + this.offset + " - " + this.patternCount)
-      console.log(this.pattern);
       this.currentTime = 0;
       return 0;
     }
@@ -333,6 +345,10 @@ var PMG_TRACK_ = function(name, vol,  instrument, structure){
     }
 
   };
+
+  /*
+  Retrieve information from the track object.
+  */
   this.getInfoDump = function(){
     return {
       "name": this.name,
@@ -363,6 +379,8 @@ var PROCEDURAL_METAL_GENERATOR_ = function(seed){
   this.play = true;
   this.tracksInfo = [];
 
+  this.redrawQuery = 0;
+
   for( var li = 1; li < 11; li++)
   {
     PMG_BASEPATTERNS.symbals.push([li+"", " ", " ", " "]);
@@ -387,20 +405,37 @@ var PROCEDURAL_METAL_GENERATOR_ = function(seed){
     symbals: PMG_BASEPATTERNS.symbals
   };
 
+  /*
+  Create 3 tracks based on preset patterns and instruments: Drums, Chrugs, and symbals.
+  */
   this.tracks = [
-    new PMG_TRACK_("DRUMS",1, PMG_BASEINSTRUMENTS.drumA, new PMG_STRUCTURE_SET(this.patterns.drum)),
-    new PMG_TRACK_("CHRUGS",0.8, PMG_BASEINSTRUMENTS.chrugs, new PMG_STRUCTURE_SET(this.patterns.chrugs)),
-    new PMG_TRACK_("SYMBALS",1, PMG_BASEINSTRUMENTS.symbals, new PMG_STRUCTURE_SET(this.patterns.symbals)),
+    new PMG_TRACK_("DRUMS",1, PMG_BASEINSTRUMENTS.drumA, new PMG_STRUCTURE_SET(PMG_BASEPATTERNS.drumA)),
+    new PMG_TRACK_("CHRUGS",0.8, PMG_BASEINSTRUMENTS.chrugs, new PMG_STRUCTURE_SET(PMG_BASEPATTERNS.chrugs)),
+    new PMG_TRACK_("SYMBALS",1, PMG_BASEINSTRUMENTS.symbals, new PMG_STRUCTURE_SET(PMG_BASEPATTERNS.symbals)),
   ];
-  //this.structures =
+
+  /*
+  Calling each track's step.
+  */
   this.step = function(timer){
     if(this.play)
     for (var i = 0; i< this.tracks.length; i++)
     {
       this.tracks[i].step();
     }
+    this.redrawQuery ++;
   }
 
+  /*
+  is true every 4 steps.
+  */
+  this.getRedrawQuery = function(){
+    return (!(this.redrawQuery % 4 > 0))?true:false;
+  }
+
+  /*
+  Retrieve information from the PMG object.
+  */
   this.getInfoDump = function(){
     for(var i in this.tracks)
     this.tracksInfo[i] = this.tracks[i].getInfoDump();
