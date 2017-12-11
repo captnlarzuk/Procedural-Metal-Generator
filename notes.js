@@ -1,6 +1,6 @@
 var NOTECONF = {
   "o": 25,
-  " ": 0,
+  " ": 0
 }
 
 var NOTE_ = function(desc){
@@ -25,7 +25,8 @@ var NOTE_ = function(desc){
   this.soundFile.play();
 
   this.play = function(){
-    this.soundFile.currentTime = 0.00;
-    setTimeout(this.soundFile.play(), 0.0 );
+    let soundFile = this.soundFile;
+    soundFile.currentTime = 0.00;
+    setTimeout(function() { soundFile.play()}, 0);
   }
 }
