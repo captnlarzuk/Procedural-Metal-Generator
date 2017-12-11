@@ -307,21 +307,20 @@ var PMG_TRACK_ = function(name, vol,  instrument, structure){
   this.vol = vol;
   this.pattern = this.structure.getPattern();
   this.patternCount = 0;
-  this.step = function(){
-    this.currentTime++;
+  this.step = function(currentPattern){
+    this.currentTime = currentPattern;
 
     if(!this.pattern)
     return false;
 
-    this.offset = this.currentTime%(CONFIG.bpb);
+    this.offset = currentPattern%(CONFIG.bpb);
     if(!this.offset)
-    this.patternCount++;
-    if(this.patternCount > this.structure.repeat * 4)
+      this.patternCount++;
+    if(this.patternCount > this.structure.repeat * this.pattern.length )
     {
       this.changed ++;
       this.pattern = this.structure.getNextPattern();
-      this.currentTime = 0;
-      this.patternCount = 0;
+
     }
 
     var pat = this.pattern[this.patternCount%this.pattern.length];
@@ -419,11 +418,14 @@ var PROCEDURAL_METAL_GENERATOR_ = function(seed){
   */
   this.step = function(timer){
     if(this.play)
-    for (var i = 0; i< this.tracks.length; i++)
     {
-      this.tracks[i].step();
+      this.currentPattern ++;
+      for (var i = 0; i< this.tracks.length; i++)
+      {
+        this.tracks[i].step(this.currentPattern);
+      }
+      this.redrawQuery ++;
     }
-    this.redrawQuery ++;
   }
 
   /*
