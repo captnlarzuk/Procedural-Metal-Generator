@@ -1,0 +1,232 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+  * {
+    box-sizing: border-box;
+    font-family: monospace;
+  }
+  body{
+    background: #222;
+    color: #fff;
+    font-size: 15px;
+    border: 3px outset #222;
+    width: 950px;
+    margin: auto;
+    padding: 5px;
+  }
+  a, a:active, a:enabled, a:focus, a:hover {
+    color: #fff;
+  }
+  a:hover{
+    font-weight: bold;
+  }
+
+  .pattern {
+    border: 2px solid #222;
+    padding: 5px;
+    margin: 5px;
+    display: inline-block;
+    float: left;
+  }
+
+  .pattern .Info {
+
+  }
+  .trackInfo ul {
+    padding: 0;
+    list-style-type: none;
+  }
+  .trackInfo li {
+    text-indent: 0px;
+    margin: 0px;
+    padding: 3px;
+  }
+  .pattern .pattern_square {
+    font-size: 12px;
+    border: 2px outset #888;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 20px;
+    border-radius: 10px;
+    display:inline-block;
+    width: 30px;
+    height: 20px;
+    padding:0px;
+    margin: 1px;
+  }
+  .pattern .pattern_square_empty{
+    color: #888;
+    background-color: #ddd;
+  }
+  .pattern .pattern_square_full {
+    color: #fff;
+    background-color: #888 ;
+  }
+  .pattern .playing {
+    border: 2px inset #888;
+    background: #222;
+  }
+
+
+  .trackInfo {
+    font-size: 12px;
+    border: 2px solid #222;
+    padding: 5px;
+    margin: 5px;
+    display: inline-block;
+    float: left;
+  }
+  #show {
+    height: 500px;
+    overflow: auto;
+    background: #eee;
+    color:#222;
+    padding: 5px;
+    font-size: 20px;
+    white-space: nowrap;
+  }
+  </style>
+  <meta charset="UTF-8">
+  <script src="./md5.min.js"></script>
+  <script src="./notes.js"></script>
+  <script src="./instruments.js"></script>
+
+
+
+
+  <script src="world.js"></script>
+</head>
+<body onload="start()">
+  <h1>Procedural Metal Generator (first ship)</h1>
+  <h2>What is this?</h2>
+  <p>
+    <strong>ENDLESS FREE PROCEDURAL METAL OMG !!!!</strong>
+  </p>
+  <p>
+    The project just started as it is now. I'll make a big cleanup, refacto, and githubing soon.
+  </p>
+  <p>
+    It's a hacky challenge. The actual version took about 12h to code from <a href="https://twitter.com/xHackira/status/938070949643083776">an idea shared by a friend</a> on twitter.
+  </p>
+  <p>
+    The goal is to create Metal (Djent, death, stoner...) procedurally. The music you hear (i hope) is entierly created by an algorithm, which i feed in randomness (for now). Each time you'll hit F5, the music will be totally new.
+  </p>
+  <p>
+    I will make something beautiful with that, but that my fiend is for another night.
+  </p>
+  <p>
+    Don't look the code now, it's so skethy it might bite your balls off.
+  </p>
+  <h2>You're listenning to:</h2>
+<center>
+  <label for="seedInput">Seed: </label>
+  <input name="seedInput" type="text" id="seedInput" value="CacaMou"/>
+  <button onclick="document.getElementById('seedInput').value = createSeed();PMG = new PROCEDURAL_METAL_GENERATOR_(document.getElementById('seedInput').value);">Random</button>
+  <hr />
+  <button onclick=" PMG = new PROCEDURAL_METAL_GENERATOR_(document.getElementById('seedInput').value);">Procedurate the metal \m/,</button>
+  <button onclick=" PMG.play = false; ">stop</button>
+  <button onclick=" PMG.play = true; ">play</button>
+  <hr />
+  <div id="show">
+
+  </div>
+
+</center>
+  <hr style="clear: both;"/>
+  <p>
+    GNU license, V3, music under Cc By-Nc-Sa
+  </p>
+  <p>
+    Sloppyly coded by <a href="https://twitter.com/CaptnLarzuk">@CaptnLarzuk</a>. Hope you'll like it.
+  </p>
+
+</body>
+<script>
+
+var CONFIG = {
+  bpb: 4,
+  bpmSet: [80, 110, 120, 140 ]
+}
+
+function draw_pattern( pattern, count, offset){
+  var str = "<div class='pattern'>";
+  var playing = " playing"
+  var cssclass = ""
+  for(var k = 0; k<= pattern.length; k ++)
+  {
+    if(!(k%4))
+      str += "<br />";
+    if(typeof pattern[k] !== "undefined")
+    for(var l = 0; l< pattern[k].length; l ++)
+    {
+      cssclass = (count == k && offset == l)?playing:"";
+      if((pattern[k][l]==" "))
+      str += "<span class='pattern_square pattern_square_empty"+cssclass+"'> </span>";
+      else
+      str += "<span class='pattern_square pattern_square_full"+cssclass+"'>"+pattern[k][l]+"</span>";
+    }
+    str += "<br />"
+  }
+  str +=   "</div>";
+  return str;
+}
+
+function createSeed(){
+  return md5(Math.random());
+}
+var PMG = new PROCEDURAL_METAL_GENERATOR_(document.getElementById('seedInput').value)  ;
+function showInfo()
+{
+  var str = "<div class='Info'>";
+  var info = PMG.getInfoDump();
+  var tracks = info.track;
+  str += "<h2> Now playing: </h2>"
+  + "<ul>"
+  + "<li>Seed : " + info.config.seed + "</li>"
+  + "<li>Bpm : " + info.config.bpm + "</li>"
+  + "</ul>"
+  for(i in tracks)
+  {
+    str += showTrackInfo(tracks[i]);
+    str += draw_pattern(tracks[i].pattern,tracks[i].config.patternCount, tracks[i].config.offset );
+  }
+  str += "</div>";
+  return str;
+}
+function showTrackInfo(track){
+  var str = "<div class='trackInfo'>";
+  str += "<h2>"+track.name+"</h2>"
+  +"<ul>"
+  + "<li> BEAT "+track.config.offset+"/"+track.config.patternCount+"</li>"
+  + "<li> entropy "+track.structureInfo.config.entropy+"</li>"
+  + "<li> repeat "+track.structureInfo.config.repeat+"</li>"
+  + "<li> offset "+track.structureInfo.config.offset+"</li>"
+  +"</ul>";
+  str += "</div>";
+  return str;
+}
+function showPatternInfo()
+{
+
+}
+
+function start(){
+  setTimeout(start, PMG.timer);
+  var info = PMG.getInfoDump();
+  document.getElementById('show').innerHTML = showInfo();
+
+/*  + "<pre>"+JSON.stringify(info.config, null, "\t")+"</pre>"
+  + "<pre>"+JSON.stringify(info.track[0].config, null, "\t")+"</pre>"
+  + "<pre>"+JSON.stringify(info.track[0].structureInfo.config, null, "\t")+"</pre>"
+  + "<pre>"+JSON.stringify(info.track[1].config, null, "\t")+"</pre>"
+  + "<pre>"+JSON.stringify(info.track[1].structureInfo.config, null, "\t")+"</pre>"
+  + "<pre>"+JSON.stringify(info.track[2].config, null, "\t")+"</pre>";
+  + "<pre>"+JSON.stringify(info.track[2].structureInfo.config, null, "\t")+"</pre>"*/
+   PMG.step();
+}
+
+</script>
+
+</html>
