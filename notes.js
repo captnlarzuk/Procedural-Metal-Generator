@@ -1,6 +1,6 @@
 var NOTECONF = {
   "o": 25,
-  " ": 0,
+  " ": 0
 }
 
 var NOTE_ = function(desc){
